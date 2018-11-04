@@ -18,11 +18,11 @@ public class UserPatch {
 ```
 ...we can check with `isSet` if the value was present in the JSON:
 ```java
-User user = // ...deserialize
+UserPatch user = // ...deserialize
 user.name.isSet() // true
 user.age.isSet() // false
 
-var userEntity = // ...read from DB
+User userEntity = // ...read from DB
 user.name.ifSet(userEntity::setName)
 user.age.ifSet(userEntity::setAge)
 ```
