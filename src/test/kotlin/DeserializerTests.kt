@@ -5,6 +5,7 @@ import junit.framework.Assert.*
 import models.PatchableDTO
 import bg.arusenov.patchable.Patchable
 import bg.arusenov.patchable.jackson.PatchableDeserializer
+import bg.arusenov.patchable.jackson.PatchableModule
 import org.junit.Test
 
 class DeserializerTests {
@@ -13,7 +14,7 @@ class DeserializerTests {
     fun `Missing JSON property should deserialize to Patchable#notSet()`() {
         val mapper = ObjectMapper()
         mapper.registerKotlinModule()
-        mapper.registerModule(SimpleModule().addDeserializer(Patchable::class.java, PatchableDeserializer()))
+        mapper.registerModule(PatchableModule())
 
         lateinit var result: PatchableDTO
         var json = """
