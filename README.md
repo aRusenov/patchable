@@ -5,11 +5,7 @@ A `Patchable` is a opinionated class that mimics the Java 8 `Optional` with an e
 a PATCH request if the client is actually sending a `null` or the value should simply be omitted.
 
 ## Example
-Having the following JSON:
-```json
-{"name": "Pesho"}
-```
-...and the following DTO:
+Given the following DTO:
 ```java
 public class UserPatch {
     public Patchable<String> name;
@@ -18,10 +14,15 @@ public class UserPatch {
 ```
 ...we can check with `isSet` if the value was present in the JSON:
 ```java
-UserPatch user = // ...deserialize
-user.name.isSet() // true
-user.age.isSet() // false
+ObjectMapper mapper = new ObjectMapper();
+mapper.registerModule(new PatchableModule());
+UserPatch user = objectMapper.readValue("{\"name\": \"Pesho\"}", UserPatch.class);
+user.name.isSet(); // true
+user.age.isSet(); // false
+```
 
+Furthermore, there's the `ifSet` utility method:
+```
 User userEntity = // ...read from DB
 user.name.ifSet(userEntity::setName)
 user.age.ifSet(userEntity::setAge)
