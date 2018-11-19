@@ -1,7 +1,6 @@
 import models.UserToValidate
 import org.junit.Assert
 import org.junit.Test
-
 import javax.validation.Validation
 import javax.validation.constraints.Email
 
@@ -17,7 +16,7 @@ class ValidationTests {
 
         val validationErrors = validator.validate(user)
         Assert.assertEquals(1, validationErrors.size.toLong())
-        val failingConstraintAnnotation = validationErrors.stream().findFirst().get()
+        val failingConstraintAnnotation = validationErrors.first()
                 .constraintDescriptor
                 .annotation
                 .annotationClass

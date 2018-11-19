@@ -1,6 +1,5 @@
 package bg.arusenov.patchable
 
-import com.fasterxml.jackson.annotation.JsonInclude
 import java.util.function.Consumer
 
 class Patchable<T> private constructor() {
@@ -25,6 +24,12 @@ class Patchable<T> private constructor() {
     fun ifSet(c: Consumer<T>) {
         if (this.isSet) {
             c.accept(this.value as T)
+        }
+    }
+
+    fun ifSet(c: (v: T) -> Unit) {
+        if (this.isSet) {
+            c(this.value as T)
         }
     }
 
