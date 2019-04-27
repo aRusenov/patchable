@@ -5,42 +5,67 @@ A `Patchable` is a opinionated class that mimics the Java 8 `Optional` with an e
 a PATCH request if the client is actually sending a `null` or the value should simply be omitted.
 
 ## Example
-Given the following DTO:
+Given the following request bean:
 ```java
 public class UserPatch {
-    public Patchable<String> name;
-    public Patchable<Integer> age;
+    private Patchable<String> name = Patchtable.notSet();
+    private Patchable<Integer> age = Patchtable.notSet();
+    
+    public Patchable<String> getName() {
+        return this.name;
+    }
+    
+    public Patchable<Integer> getAge() {
+        return this.age;
+    }
 }
 ```
-...we can check with `isSet` if the value was present in the JSON:
+we can check with `isSet` if the value was present in the JSON:
 ```java
 ObjectMapper mapper = new ObjectMapper();
 mapper.registerModule(new PatchableModule());
-UserPatch user = objectMapper.readValue("{\"name\": \"Pesho\"}", UserPatch.class);
-user.name.isSet(); // true
-user.age.isSet(); // false
+UserPatch userPatch = objectMapper.readValue("{\"name\": \"Juan\"}", UserPatch.class);
+
+userPatch.getName().isSet(); // true
+userPatch.getAge().isSet();  // false
 ```
 
-Furthermore, there's the `ifSet` utility method:
+Furthermore, we can use the `ifSet` utility method:
 ```
-User userEntity = // ...read from DB
-user.name.ifSet(userEntity::setName)
-user.age.ifSet(userEntity::setAge)
+// Read entity from database
+User userEntity = repository.getUser();
+
+// Apply changes only to the actually set fields from the PATCH request
+userPatch.getName().ifSet(userEntity::setName)
+userPatch.getAge().ifSet(userEntity::setAge)
 ```
 
 ## Features & Behavior
-`Patchable` currently only has Jackson support.
+`Patchable` currently has Jackson support. To enable the serialization / deserialization behavior the `PatchableModule()`
+must be registered to the Jackson `ObjectMapper`.
+```java
+ObjectMapper appMapepr = new ObjectMapper();
+mapper.registerModule(new PatchableModule());
+```
 ### Serialization
-The `Patchable` field is added to the result JSON only if `isSet=true`.
+When serializing to JSON, the `Patchable`'s value is added to the result JSON only if it actually has
+a set value.
+```java
+UserPatch patch = new UserPatch();
+// patch.setName("..."); commented out
+patch.setAge(10);
+
+appMapper.writeValueAsString(patch); // {"age": 10}
+```
 
 ### Deserialization
-A `Patchable` property will never be `null`, even if missing from the JSON string - in that 
-case it's a `Patchable.notSet()` instance. It will never be null.
+The bean we deserialize into should initialize all `Patchable<T>` fields as `Patchable.notSet()`. 
+The value will be overriden by the deserializer only if the field value is present in the JSON.
 
 ### Validation
-Supports Hibernate Validator. Validation only triggers if the Patchable has a set value.
+Supports Hibernate Validator. Validation only triggers if the Patchable has a set value. Example:
 ```java
-public class UserToValidate {
+public class UserPatch {
 
     private Patchable<@NotNull @Email String> email = Patchable.of("not_email");
 }
