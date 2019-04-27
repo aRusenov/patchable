@@ -12,8 +12,8 @@ class KotlinTest {
 
         val presetLastname = UUID.randomUUID().toString()
         val bean = Bean().apply { lastName = presetLastname }
-        patchableA.ifSet(bean::firstName::set)
-        patchableB.ifSet(bean::lastName::set)
+        patchableA.ifSetK(bean::firstName::set)
+        patchableB.ifSetK(bean::lastName::set)
 
         Assert.assertEquals("Gosho", bean.firstName)
         Assert.assertEquals(presetLastname, bean.lastName)

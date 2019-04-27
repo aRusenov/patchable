@@ -12,7 +12,7 @@ public class JavaTest {
         Patchable<Integer> age = Patchable.notSet();
 
         name.ifSet(bean::setName);
-        age.ifSet(bean::setAge);
+        age.ifSet(a -> bean.setAge(a));
 
         Assert.assertEquals("B", bean.getName());
         Assert.assertEquals(32, bean.getAge());

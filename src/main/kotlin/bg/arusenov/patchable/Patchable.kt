@@ -27,7 +27,7 @@ class Patchable<T> private constructor() {
         }
     }
 
-    fun ifSet(c: (v: T) -> Unit) {
+    fun ifSetK(c: (v: T) -> Unit) {
         if (this.isSet) {
             c(this.value as T)
         }
